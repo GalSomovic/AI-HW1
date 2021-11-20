@@ -20,7 +20,7 @@ class BreadthFirstSearchRobot(Robot):
         self.queue = None
         self.close = None
         self.name = "breadth first search robot"
-
+#here self.queue acts as open list (see tirgul 2 slide 29)    
     def solve(self, maze: MazeProblem, time_limit=float("inf")):
         start_time = curr_time()
 
@@ -45,9 +45,8 @@ class BreadthFirstSearchRobot(Robot):
                 break
 
             self.close.add(next_node)
-            ############################################################################################################
-            # TODO (EX. 4.1): complete code here, delete exception
-            raise NotImplemented
+            for s in next_node.get_node().expand_state():
+                
 
             ############################################################################################################
         # If we are here, then we didn't find a solution during the search
