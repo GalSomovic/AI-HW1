@@ -20,9 +20,9 @@ class BreadthFirstSearchRobot(Robot):
         self.queue = None
         self.close = None
         self.name = "breadth first search robot"
-#here self.queue acts as open list (see tirgul 2 slide 29)    
+
     def solve(self, maze: MazeProblem, time_limit=float("inf")):
-        start_time = curr_time()
+        start_time = curr_time()  # here self.queue acts as open list (see tirgul 2 slide 29)
 
         self.queue = Queue()
         self.close = NodesCollection()
@@ -39,14 +39,21 @@ class BreadthFirstSearchRobot(Robot):
                 break
 
             next_node = self.queue.pop()
+            n_node_expanded += 1
             if next_node is None:
                 no_solution_found = True
                 no_solution_reason = "no solution exists"
                 break
 
             self.close.add(next_node)
-            for s in next_node.get_node().expand_state():
-                
+            for s in maze.expand_state(next_node.state):
+                if not (s[0] in self.queue or s[0] in self.close):
+                    new = Node(s[0], next_node, g_value=next_node.g_value+s[1])
+                    if maze.is_goal(new.state):
+                        return GraphSearchSolution(final_node=new, solve_time=curr_time() - start_time,
+                                                   n_node_expanded=n_node_expanded)
+
+                    self.queue.add(new)
 
             ############################################################################################################
         # If we are here, then we didn't find a solution during the search
@@ -125,6 +132,7 @@ class UniformCostSearchRobot(BestFirstSearchRobot):
     def _calc_node_priority(self, node):
         # TODO (Ex. 5.2): complete code here (just return the g value), delete exception
         raise NotImplemented
+
 
 class WAStartRobot(BestFirstSearchRobot):
     def __init__(self, heuristic, w=0.5, **h_params):
