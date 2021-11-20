@@ -48,7 +48,7 @@ class BreadthFirstSearchRobot(Robot):
             self.close.add(next_node)
             for s in maze.expand_state(next_node.state):
                 if not (s[0] in self.queue or s[0] in self.close):
-                    new = Node(s[0], next_node, g_value=next_node.g_value+s[1])
+                    new = Node(s[0], next_node, g_value=next_node.g_value + s[1])
                     if maze.is_goal(new.state):
                         return GraphSearchSolution(final_node=new, solve_time=curr_time() - start_time,
                                                    n_node_expanded=n_node_expanded)
@@ -103,15 +103,25 @@ class BestFirstSearchRobot(Robot):
                 no_solution_found = True
                 no_solution_reason = "no solution exists"
                 break
-
             self.close.add(next_node)
             if maze_problem.is_goal(next_node.state):
                 if not compute_all_dists:  # we will use this later, don't change
                     return GraphSearchSolution(next_node, solve_time=curr_time() - start_time,
                                                n_node_expanded=n_node_expanded, init_heuristic_time=init_heuristic_time)
-            ############################################################################################################
-            # TODO (EX. 5.1): complete code here, delete exception
-            raise NotImplemented
+            n_node_expanded += 1
+            for s in maze_problem.expand_state(next_node.state):
+                if not (s[0] in self.close):
+                    if s[0] in self.open:
+                        old_node = self.open.get_node(s[0])
+                        if old_node.g_value > next_node.g_value + s[1]:
+                            self.open.remove_node(old_node)
+                            old_node.g_value = next_node.g_value + s[1]
+                            old_node.parent = next_node
+                            self.open.add(old_node, self._calc_node_priority(old_node))
+
+                    else:
+                        new_node = Node(s[0], next_node, next_node.g_value + s[1])
+                        self.open.add(new_node, self._calc_node_priority(new_node))
 
             ############################################################################################################
 
@@ -130,8 +140,7 @@ class UniformCostSearchRobot(BestFirstSearchRobot):
         self.name = "uniform cost search robot"
 
     def _calc_node_priority(self, node):
-        # TODO (Ex. 5.2): complete code here (just return the g value), delete exception
-        raise NotImplemented
+        return node.g_value
 
 
 class WAStartRobot(BestFirstSearchRobot):
